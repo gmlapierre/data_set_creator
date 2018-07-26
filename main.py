@@ -16,14 +16,14 @@ def get_immediate_subdirectories(path_directory, excludes=False, names_only=Fals
         if names_only:
             return tmp
         else:
-            return [path_directory + '\\' + e for e in tmp]
+            return [path_directory + '/' + e for e in tmp]
     else:
         tmp = [name for name in os.listdir(path_directory)
                if os.path.isdir(os.path.join(path_directory, name))]
         if names_only:
             return tmp
         else:
-            return [path_directory + '\\' + e for e in tmp]
+            return [path_directory + '/' + e for e in tmp]
 
 
 def get_images_path(path_directory_images, extensions, names_only=False):
@@ -34,7 +34,7 @@ def get_images_path(path_directory_images, extensions, names_only=False):
     if names_only:
         return tmp
     else:
-        return [path_directory_images + '\\' + e for e in tmp]
+        return [path_directory_images + '/' + e for e in tmp]
 
 
 def create_directories(path_list):
@@ -58,7 +58,7 @@ def copy_images(dict_images_paths, path_target, config):
     # Copy the images to the respective folder
     # Assumes the folders were already created
     for key in dict_images_paths:
-        list_class_path.append(path_target + '\\' + key)
+        list_class_path.append(path_target + '/' + key)
     create_directories(list_class_path)
 
     # extract filename from image paths (list)
@@ -67,11 +67,11 @@ def copy_images(dict_images_paths, path_target, config):
     i = 0
     for key in dict_images_paths:
         for y in dict_images_paths[key]:
-            if os.path.exists(list_class_path[x_] + '\\' + os.path.basename(y)):
+            if os.path.exists(list_class_path[x_] + '/' + os.path.basename(y)):
                 i += 1
-                copyfile(y, list_class_path[x_] + '\\' + '(' + str(i) + ')' + os.path.basename(y))
+                copyfile(y, list_class_path[x_] + '/' + '(' + str(i) + ')' + os.path.basename(y))
             else:
-                copyfile(y, list_class_path[x_] + '\\' + os.path.basename(y))
+                copyfile(y, list_class_path[x_] + '/' + os.path.basename(y))
         x_ += 1
 
 
