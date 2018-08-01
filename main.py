@@ -3,10 +3,9 @@ from os import listdir
 from os.path import isfile, join
 from shutil import copyfile
 from configparser import ConfigParser
+import sys
 import json
-
-config = ConfigParser()
-config.read(r'./app.conf')
+import argparse
 
 
 def get_immediate_subdirectories(path_directory, excludes=False, names_only=False):
@@ -75,28 +74,57 @@ def copy_images(dict_images_paths, path_target, config):
         x_ += 1
 
 
-PATH_BASE_IMAGES = config['PATHS']['PATH_BASE_IMAGES']
+def build_file_mapping_dict(subdirectories, class_names, config):
+    # for each sub directory
+    x = 0
 
-gpath_parent_image_directories = get_immediate_subdirectories(PATH_BASE_IMAGES, config['IGNORE']['FOLDERS'])
+    classes_and_paths = {}
+    for subdirectory in subdirectories:
+        classes_and_paths[class_names[x]] = []
+        for sub in get_immediate_subdirectories(subdirectory, excludes=config['IGNORE']['FOLDERS']):
+            paths = get_images_path(sub, tuple(json.loads(config['IMAGE_TYPES']['EXTENSIONS'])))
+            for path in paths:
+                classes_and_paths[class_names[x]].append(path)
+        x += 1
 
-gpath_parent_image_directories_names = get_immediate_subdirectories(PATH_BASE_IMAGES, config['IGNORE']['FOLDERS'])
-
-class_names = get_immediate_subdirectories(PATH_BASE_IMAGES, excludes=config['IGNORE']['FOLDERS'], names_only=True)
-
-# build list of sub directories
-subdirectories = get_immediate_subdirectories(PATH_BASE_IMAGES, excludes=config['IGNORE']['FOLDERS'])
+    copy_images(classes_and_paths, config['PATHS']['PATH_TARGET_FOLDER'], config)
 
 
-# for each sub directory
-x = 0
+def main():
 
-classes_and_paths = {}
-for subdirectory in subdirectories:
-    classes_and_paths[class_names[x]] = []
-    for sub in get_immediate_subdirectories(subdirectory, excludes=config['IGNORE']['FOLDERS']):
-        paths = get_images_path(sub, tuple(json.loads(config['IMAGE_TYPES']['EXTENSIONS'])))
-        for path in paths:
-            classes_and_paths[class_names[x]].append(path)
-    x += 1
+    parser = argparse.ArgumentParser(description="Transform 2 level folder directories of images to 1 level")
+    parser.add_argument('-s', '--source', help='path of the source directory')
+    parser.add_argument('-t', '--target', help='path of the target directory', default=os.getcwd())
+    parser.set_defaults(extensions=['.jpg', '.png', '.jpeg'], ignore_folder='Ziplog')
+    args = parser.parse_args()
 
-copy_images(classes_and_paths, config['PATHS']['PATH_TARGET_FOLDER'], config)
+    if len(sys.argv) > 1:
+        print('script has more than 1 parameter, using command line argument')
+        config = ConfigParser()
+        config.read('app.conf')
+
+        path_base_images = args.source
+
+        class_names = get_immediate_subdirectories(path_base_images, args.extensions,
+                                                   names_only=True)
+
+        subdirectories = get_immediate_subdirectories(path_base_images, config['IGNORE']['FOLDERS'])
+
+        build_file_mapping_dict(subdirectories, class_names, config)
+    else:
+        print('using config file')
+        config = ConfigParser()
+        config.read('app.conf')
+        path_base_images = config['PATHS']['PATH_BASE_IMAGES']
+
+        class_names = get_immediate_subdirectories(path_base_images, excludes=config['IGNORE']['FOLDERS'],
+                                                   names_only=True)
+        print(config['IGNORE']['FOLDERS'])
+        # build list of sub directories
+        subdirectories = get_immediate_subdirectories(path_base_images, excludes=config['IGNORE']['FOLDERS'])
+
+        build_file_mapping_dict(subdirectories, class_names, config)
+
+
+if __name__ == '__main__':
+    main()

@@ -31,3 +31,21 @@ Images/
 --2.jpeg
 --(1)1.jpg
 --(2)2.jpeg
+
+This script can be used as command line tool or can be used with a config file (app.conf)
+located at the root of the project. If no arguments are specified, the app.conf file will be parsed
+
+usage: main.py [-h] [-s SOURCE] [-t TARGET]
+
+Transform 2 level folder directories of images to 1 level
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s SOURCE, --source SOURCE
+                        path of the source directory
+  -t TARGET, --target TARGET
+                        path of the target directory
+
+
+
+ToDo: Add description feature to count the number of classes, number of images per class etc
