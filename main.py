@@ -81,7 +81,7 @@ def build_file_mapping_dict(subdirectories, class_names, config):
     classes_and_paths = {}
     for subdirectory in subdirectories:
         classes_and_paths[class_names[x]] = []
-        for sub in get_immediate_subdirectories(subdirectory, excludes=config['IGNORE']['FOLDERS']):
+        for sub in get_immediate_subdirectories(subdirectory, excludes=json.loads(config['IGNORE']['FOLDERS'])):
             paths = get_images_path(sub, tuple(json.loads(config['IMAGE_TYPES']['EXTENSIONS'])))
             for path in paths:
                 classes_and_paths[class_names[x]].append(path)
